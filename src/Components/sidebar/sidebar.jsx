@@ -1,30 +1,36 @@
-import React from 'react';
-import { NavLink } from 'react-router-dom';
-import './SideBar.css';
+import React from "react";
+import "./sidebar.css";
+import { NavLink } from "react-router-dom";
 
-const Sidebar = () => (
-    <div className="sidebar">
-        <nav>
-            <NavLink to="/patients" activeClassName="active">
-                
-            </NavLink>
-            <NavLink to="/register" activeClassName="active">
-                
-            </NavLink>
-            <NavLink to="/enroll" activeClassName="active">
-                
-            </NavLink>
-            <NavLink to="/messages" activeClassName="active">
-                
-            </NavLink>
-            <NavLink to="/follow-up" activeClassName="active">
-            
-            </NavLink>
-            <NavLink to="/progress" activeClassName="active">
-            
-            </NavLink>
-        </nav>
+const Sidebar = () => {
+ 
+  // const options = ["Option 1", "Option 2", "Option 3", "Option 4"]; // List of options
+
+  return (
+
+    <>
+    <div className="menuBtn">
+      {/* menuBtn  */}
     </div>
-);
+    <div className="sidebar">
+      <section>
+      <h2 className="sidebarHeader">Main Menu</h2>
+        <ul>
+          <NavLink className="listItem menuItem" to="./patients">Patient</NavLink>
+          <NavLink className="listItem menuItem"  to="./reminder">Reminder</NavLink>
+          {/* <NavLink className="listItem menuItem"  to="./appointment">Appointment</NavLink> */}
+          <NavLink className="listItem menuItem"  to="./enroll-patients">Enroll Patients</NavLink>
+          <NavLink className="listItem menuItem"  to="./registration">Registration</NavLink>
+          <NavLink className="listItem menuItem"  to="./sms integration">SMS integration</NavLink>
+        
+        </ul>
+      </section>
+
+    </div>
+    </>
+  );
+};
 
 export default Sidebar;
+
+
