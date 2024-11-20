@@ -1,0 +1,60 @@
+:root {
+  --adjusted-height: calc(100vh - 50px); /* Define a custom property */
+}
+
+.sidebar {
+  width: 250px;
+  min-height: var(--adjusted-height);
+  color: white;
+  background-color: #2C6693;
+  padding: 20px;
+  border-right: 1px solid #1D3461;
+}
+
+/* section{
+  border: 2px solid red;
+} */
+
+/* Style the list items */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.menuItem{
+  display: flex;
+  flex-direction: column;
+  color: white;
+  text-decoration: none;
+}
+@media(max-width: 678px){
+  .sidebar {
+    display: none;
+  }
+}
+.menuBtn:hover .sidebar {
+  display: contents;
+  width: 250px;
+  min-height: var(--adjusted-height);
+  color: white;
+  background-color: #2C6693;
+  padding: 20px;
+  border-right: 1px solid #1D3461;
+}
+.sidebar ul .listItem {
+  margin-left: 30px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  font-weight: 300;
+  font-size: .9rem;
+}
+
+.sidebarHeader {
+  /* background-color: #1D3461; */
+  padding: 0;
+  margin: 0;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+/* Add more styles as per your design requirements */
