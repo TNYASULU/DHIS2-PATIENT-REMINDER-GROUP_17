@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-// Uncomment and import useDataQuery if you intend to use it
-// import { useDataQuery } from '@dhis2/app-runtime';
-import './Registration.css'; // Ensure the CSS file is in the correct location
+
+import './Registration.css';
 
 const Registration = () => {
   const [formData, setFormData] = useState({
@@ -9,14 +8,11 @@ const Registration = () => {
     lastName: '',
     sex: '',
     organizationUnit: '',
-    program: '',
   });
 
-  // Define organization units and programs
+
   const organizationUnits = ['Unit 1', 'Unit 2', 'Unit 3'];
-  const programs = ['Program A', 'Program B', 'Program C'];
 
-  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -26,9 +22,24 @@ const Registration = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Patient Data:', formData);
     alert('Registration Successful!');
   };
+
+  return (
+    <div className="registration-container">
+      <h2>Patient Registration</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>First Name:</label>
+          <input
+            type="text"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            placeholder="Enter first name"
+            required
+          />
+        </div>

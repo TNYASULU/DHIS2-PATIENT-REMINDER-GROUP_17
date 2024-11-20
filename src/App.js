@@ -1,10 +1,8 @@
 
-import i18n from '@dhis2/d2-i18n'
 import React from 'react'
-import classes from './App.module.css'
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Registration from "./Components/Registration/Registration";
-import Sidebar from "./Components/sidebar/sidebar";
+import sidebar from "./Components/sidebar/sidebar";
 import Enrollment from "./Components/Enrollment/enroll";
 import { DataProvider } from '@dhis2/app-runtime';
 
