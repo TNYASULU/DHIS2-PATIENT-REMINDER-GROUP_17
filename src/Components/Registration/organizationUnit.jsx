@@ -16,4 +16,16 @@ const OrganizationUnitDropdown = ({ value, onChange }) => {
   
     if (loading) return <CircularLoader small />;
     if (error) return <span>Error loading organization units</span>;
-  
+    return (
+        <select name="organizationUnit" value={value} onChange={onChange} required>
+          <option value="">Select unit</option>
+          {data.orgUnits.organisationUnits.map((unit) => (
+            <option key={unit.id} value={unit.id}>
+              {unit.displayName}
+            </option>
+          ))}
+        </select>
+      );
+    };
+    
+    export default OrganizationUnitDropdown;
