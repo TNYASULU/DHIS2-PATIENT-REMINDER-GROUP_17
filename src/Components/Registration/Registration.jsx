@@ -43,3 +43,17 @@ const Registration = () => {
             required
           />
         </div>
+        <div className="form-group">
+          <label>Sex:</label>
+         <select
+            name="sex"
+            value={formData.sex}
+            onChange={handleChange}
+            required
+          >
+          <option value="">Select sex</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+         </select>
+      </div>

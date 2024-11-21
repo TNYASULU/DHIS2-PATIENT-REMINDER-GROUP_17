@@ -1,5 +1,5 @@
 import React from 'react';
-import '../reminder/reminder.css'; 
+//import '../reminder/reminder.css'; 
 import { useDataQuery } from "@dhis2/app-runtime";
 const myQuery = {
     results: {
