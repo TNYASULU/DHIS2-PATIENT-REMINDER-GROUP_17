@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-
+import { NoticeBox, Button } from '@dhis2/ui';
+import OrganizationUnitDropdown from './OrganizationUnitDropdown'; 
 import './Registration.css';
 
 const Registration = () => {
@@ -10,13 +11,8 @@ const Registration = () => {
     organizationUnit: '',
   });
 
+  const [showNotice, setShowNotice] = useState(true);
 
-  const organizationUnits = ['Unit 1', 'Unit 2', 'Unit 3'];
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -57,3 +53,19 @@ const Registration = () => {
           <option value="Other">Other</option>
          </select>
       </div>
+      <div className="form-group">
+          <label>Organization Unit:</label>
+          <OrganizationUnitDropdown
+            value={formData.organizationUnit}
+            onChange={handleChange}
+          />
+        </div>
+        <Button primary type="submit">
+          Register
+        </Button>
+      </form>
+    </div>
+  );
+};
+
+export default Registration;
