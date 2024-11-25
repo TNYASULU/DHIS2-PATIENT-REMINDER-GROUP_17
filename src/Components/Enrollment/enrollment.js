@@ -1,123 +1,236 @@
-function createEnrollmentForm() {
-    // Create form container
-    const container = document.createElement('div');
-    container.classList.add('container', 'mt-5');
+import React, { useState, useEffect } from 'react';
+import { authenticateAndGetAccessToken, scheduleReminder } from '../api/Dhis2Api'; // Adjust import paths
 
-    // Title
-    const title = document.createElement('h2');
-    title.textContent = 'Enroll Patient';
-    container.appendChild(title);
+const Enroll = () => {
+  // State for form data and fetched options
+  const [formData, setFormData] = useState({
+    orgUnit: '',
+    programId: '',
+    patientId: '',
+    enrollmentDate: ''
+  });
+  const [orgUnits, setOrgUnits] = useState([]);
+  const [programs, setPrograms] = useState([]);
+  const [patients, setPatients] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-    // Create form element
-    const form = document.createElement('form');
-    form.id = 'enrollmentForm';
+  // Fetch Organization Units from DHIS2
+  useEffect(() => {
+    const fetchOrgUnits = async () => {
+      setLoading(true);
+      try {
+        const accessToken = await authenticateAndGetAccessToken();
+        const response = await fetch('https://your-dhis2-instance/api/organisationUnits', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const data = await response.json();
+        setOrgUnits(data.organisationUnits); // Assuming data has 'organisationUnits' field
+      } catch (error) {
+        setError('Failed to load organization units');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Organization Unit select
-    const orgUnitDiv = document.createElement('div');
-    orgUnitDiv.classList.add('form-group');
-    const orgUnitLabel = document.createElement('label');
-    orgUnitLabel.setAttribute('for', 'orgUnit');
-    orgUnitLabel.textContent = 'Select Organization Unit';
-    const orgUnitSelect = document.createElement('select');
-    orgUnitSelect.classList.add('form-control');
-    orgUnitSelect.id = 'orgUnit';
-    orgUnitSelect.required = true;
-    const orgUnitPlaceholder = document.createElement('option');
-    orgUnitPlaceholder.value = '';
-    orgUnitPlaceholder.textContent = 'Select Organization Unit';
-    orgUnitSelect.appendChild(orgUnitPlaceholder);
-    orgUnitDiv.appendChild(orgUnitLabel);
-    orgUnitDiv.appendChild(orgUnitSelect);
-    form.appendChild(orgUnitDiv);
-
-    // Program select
-    const programDiv = document.createElement('div');
-    programDiv.classList.add('form-group');
-    const programLabel = document.createElement('label');
-    programLabel.setAttribute('for', 'program');
-    programLabel.textContent = 'Select Program';
-    const programSelect = document.createElement('select');
-    programSelect.classList.add('form-control');
-    programSelect.id = 'program';
-    programSelect.required = true;
-    const programPlaceholder = document.createElement('option');
-    programPlaceholder.value = '';
-    programPlaceholder.textContent = 'Select Program';
-    programSelect.appendChild(programPlaceholder);
-    programDiv.appendChild(programLabel);
-    programDiv.appendChild(programSelect);
-    form.appendChild(programDiv);
-
-    // Patient select
-    const patientDiv = document.createElement('div');
-    patientDiv.classList.add('form-group');
-    const patientLabel = document.createElement('label');
-    patientLabel.setAttribute('for', 'patient');
-    patientLabel.textContent = 'Select Patient';
-    const patientSelect = document.createElement('select');
-    patientSelect.classList.add('form-control');
-    patientSelect.id = 'patient';
-    patientSelect.required = true;
-    const patientPlaceholder = document.createElement('option');
-    patientPlaceholder.value = '';
-    patientPlaceholder.textContent = 'Select Patient';
-    patientSelect.appendChild(patientPlaceholder);
-    patientDiv.appendChild(patientLabel);
-    patientDiv.appendChild(patientSelect);
-    form.appendChild(patientDiv);
-
-    // Date input
-    const dateDiv = document.createElement('div');
-    dateDiv.classList.add('form-group');
-    const dateLabel = document.createElement('label');
-    dateLabel.setAttribute('for', 'enrollmentDate');
-    dateLabel.textContent = 'Select Enrollment Date';
-    const dateInput = document.createElement('input');
-    dateInput.type = 'date';
-    dateInput.classList.add('form-control');
-    dateInput.id = 'enrollmentDate';
-    dateInput.required = true;
-    dateDiv.appendChild(dateLabel);
-    dateDiv.appendChild(dateInput);
-    form.appendChild(dateDiv);
-
-    // Enroll Button
-    const enrollButton = document.createElement('button');
-    enrollButton.type = 'submit';
-    enrollButton.classList.add('btn', 'btn-primary');
-    enrollButton.textContent = 'Enroll Patient';
-    form.appendChild(enrollButton);
-
-    // Response message div
-    const responseMessage = document.createElement('div');
-    responseMessage.id = 'responseMessage';
-    responseMessage.classList.add('mt-3');
-    container.appendChild(responseMessage);
-
-    // Append form to the container
-    container.appendChild(form);
-    document.body.appendChild(container);
-
-    // Call functions to fetch data
     fetchOrgUnits();
+  }, []);
+
+  // Fetch Programs from DHIS2
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      setLoading(true);
+      try {
+        const accessToken = await authenticateAndGetAccessToken();
+        const response = await fetch('https://your-dhis2-instance/api/programs', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const data = await response.json();
+        setPrograms(data.programs); // Assuming data has 'programs' field
+      } catch (error) {
+        setError('Failed to load programs');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPrograms();
+  }, []);
+
+  // Fetch Patients (Tracked Entity Instances)
+  useEffect(() => {
+    const fetchPatients = async () => {
+      setLoading(true);
+      try {
+        const accessToken = await authenticateAndGetAccessToken();
+        const response = await fetch('https://your-dhis2-instance/api/trackedEntityInstances', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const data = await response.json();
+        setPatients(data.trackedEntityInstances); // Assuming data has 'trackedEntityInstances' field
+      } catch (error) {
+        setError('Failed to load patients');
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchPatients();
+  }, []);
 
-    // Handle form submission
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();
+  // Handle form data change
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
-        const orgUnit = document.getElementById('orgUnit').value;
-        const program = document.getElementById('program').value;
-        const patient = document.getElementById('patient').value;
-        const enrollmentDate = document.getElementById('enrollmentDate').value;
+  // Handle form submission for enrolling the patient
+  const handleEnrollPatient = async (event) => {
+    event.preventDefault();
+    const accessToken = await authenticateAndGetAccessToken();
 
-        if (!orgUnit || !program || !patient || !enrollmentDate) {
-            alert('All fields are required!');
-            return;
-        }
+    try {
+      const enrollmentDetails = {
+        program: formData.programId,
+        trackedEntityInstance: formData.patientId, // Unique patient ID
+        orgUnit: formData.orgUnit, // Selected organization unit
+        enrollmentDate: formData.enrollmentDate, // Enrollment date
+      };
 
-        enrollPatient(orgUnit, program, patient, enrollmentDate);
-    });
-}
+      // API call to enroll the patient (replace with actual DHIS2 endpoint)
+      await fetch('https://your-dhis2-instance/api/enrollments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(enrollmentDetails),
+      });
+
+      // Example reminder scheduling (adjust as necessary)
+      const reminderDetails = {
+        message: `Hello ${formData.patientId}, this is your reminder.`,
+        date: formData.enrollmentDate, // Example date, can be adjusted
+      };
+      await scheduleReminder(formData.programId, reminderDetails, accessToken);
+
+      console.log('Patient enrolled and reminder scheduled.');
+    } catch (error) {
+      setError('Error enrolling patient or scheduling reminder');
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className="enroll-form">
+      <h1>Enroll Patient</h1>
+      <form onSubmit={handleEnrollPatient}>
+        {/* Select Organization Unit */}
+        <div className="form-group">
+          <label htmlFor="orgUnit">Select Organization Unit</label>
+          <select
+            id="orgUnit"
+            name="orgUnit"
+            value={formData.orgUnit}
+            onChange={handleChange}
+            required
+          >
+            <option value="" disabled>Select Organization Unit</option>
+            {loading ? (
+              <option>Loading...</option>
+            ) : error ? (
+              <option>{error}</option>
+            ) : (
+              orgUnits.map((unit) => (
+                <option key={unit.id} value={unit.id}>
+                  {unit.name}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+
+        {/* Select Program */}
+        <div className="form-group">
+          <label htmlFor="programId">Select Program</label>
+          <select
+            id="programId"
+            name="programId"
+            value={formData.programId}
+            onChange={handleChange}
+            required
+          >
+            <option value="" disabled>Select Program</option>
+            {loading ? (
+              <option>Loading...</option>
+            ) : error ? (
+              <option>{error}</option>
+            ) : (
+              programs.map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.displayName}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+
+        {/* Select Patient */}
+        <div className="form-group">
+          <label htmlFor="patientId">Select Patient</label>
+          <select
+            id="patientId"
+            name="patientId"
+            value={formData.patientId}
+            onChange={handleChange}
+            required
+          >
+            <option value="" disabled>Select Patient</option>
+            {loading ? (
+              <option>Loading...</option>
+            ) : error ? (
+              <option>{error}</option>
+            ) : (
+              patients.map((patient) => (
+                <option key={patient.id} value={patient.id}>
+                  {patient.name}
+                </option>
+              ))
+            )}
+          </select>
+        </div>
+
+        {/* Select Enrollment Date */}
+        <div className="form-group">
+          <label htmlFor="enrollmentDate">Select Enrollment Date</label>
+          <input
+            type="date"
+            id="enrollmentDate"
+            name="enrollmentDate"
+            value={formData.enrollmentDate}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        {/* Submit Button */}
+        <button type="submit" disabled={loading}>Enroll</button>
+      </form>
+
+      {error && <p className="error">{error}</p>}
+    </div>
+  );
+};
+
+export default Enroll;
+
 
