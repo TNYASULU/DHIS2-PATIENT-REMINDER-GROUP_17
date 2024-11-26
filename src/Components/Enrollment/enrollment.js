@@ -21,9 +21,9 @@ const Enroll = () => {
       setLoading(true);
       try {
         const accessToken = await authenticateAndGetAccessToken();
-        const response = await fetch('https://data.research.dhis2.org/api/organisationUnits', {
+        const response = await fetch('https://data.research.dhis2.org/api/organisationUnits.json', {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: "Basic " + btoa('admin:district'),
           },
         });
         const data = await response.json();
@@ -44,9 +44,9 @@ const Enroll = () => {
       setLoading(true);
       try {
         const accessToken = await authenticateAndGetAccessToken();
-        const response = await fetch('https://your-dhis2-instance/api/programs', {
+        const response = await fetch('https://data.research.dhis2.org/api/programs.json', {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: "Basic " + btoa('admin:district'),
           },
         });
         const data = await response.json();
@@ -67,9 +67,9 @@ const Enroll = () => {
       setLoading(true);
       try {
         const accessToken = await authenticateAndGetAccessToken();
-        const response = await fetch('https://your-dhis2-instance/api/trackedEntityInstances', {
+        const response = await fetch('https://data.research.dhis2.org/api/patients.json', {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: "Basic " + btoa('admin:district'),
           },
         });
         const data = await response.json();
@@ -107,11 +107,11 @@ const Enroll = () => {
       };
 
       // API call to enroll the patient 
-      await fetch('https://your-dhis2-instance/api/enrollments', {
+      await fetch('https://data.research.dhis2.org/api/enrollments', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
+          Authorization:
         },
         body: JSON.stringify(enrollmentDetails),
       });
