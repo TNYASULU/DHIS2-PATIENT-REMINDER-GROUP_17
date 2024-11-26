@@ -21,11 +21,11 @@ const Sidebar = () => {
             {/* <NavLink className="listItem menuItem"  to="./appointment">Appointment</NavLink> */}
             
           
-            <NavLink className="listItem menuItem" to="./enroll-patients">Enroll Patients</NavLink>
+            <NavLink className="listItem menuItem" to="./Enrollment">Enrollment</NavLink>
             
-            <NavLink className="listItem menuItem" to="./registration">Registration</NavLink>
+            <NavLink className="listItem menuItem" to="./Registration">Registration</NavLink>
             
-            <NavLink className="listItem menuItem" to="./sms integration">SMS integration</NavLink>
+            <NavLink className="listItem menuItem" to="./SMSIntegration">SMSIntegration</NavLink>
             
         
         </ul>

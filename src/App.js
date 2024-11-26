@@ -5,6 +5,7 @@ import Sidebar from "./Components/sidebar/sidebar";
 import Enrollment from "./Components/Enrollment/enroll";
 import Patients from "./Components/patients/patients";
 import { Welcome } from "./Components/welcome/Welcome";
+import SMSIntegration from "./Components/SMSIntegration/SMSComponent"
 
 const MyApp = () => {
   return (
@@ -18,6 +19,7 @@ const MyApp = () => {
             <Route path="/enroll-patients" element={<Enrollment />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/registration" element={<Registration />} />
+            <Route path="/SMSIntegration" element={<SMSIntegration />} />
           </Routes>
         </div>
       </div>
