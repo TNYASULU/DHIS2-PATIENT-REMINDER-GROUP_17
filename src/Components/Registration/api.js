@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL:
-    "https://data.research.dhis2.org/in5320/api", // Update with your DHIS2 instance URL
+    "https://data.research.dhis2.org/in5320/api", // Updating with your DHIS2 instance URL
   headers: {
     "Content-Type": "application/json",
     Authorization: "Basic " + btoa("admin:district"), // Replace with your credentials
