@@ -21,7 +21,7 @@ const Enroll = () => {
       setLoading(true);
       try {
         const accessToken = await authenticateAndGetAccessToken();
-        const response = await fetch('https://your-dhis2-instance/api/organisationUnits', {
+        const response = await fetch('https://data.research.dhis2.org/api/organisationUnits', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
