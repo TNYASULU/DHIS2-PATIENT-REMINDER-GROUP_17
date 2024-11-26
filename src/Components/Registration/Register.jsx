@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDataQuery } from "@dhis2/app-runtime";
 import { registerPatient } from "./api";
 import "./Register.css";
@@ -8,130 +8,164 @@ import { Button, NoticeBox, CircularLoader } from "@dhis2/ui";
 const orgUnitQuery = {
   organisationUnits: {
     resource: "organisationUnits.json",
-    // Endpoint to fetch org units
     params: {
       level: 2,
-      // Fetch organization units at level 2
       fields: "id,name",
-      // Retrieve ID and name fields
-      paging: false // Fetch all units without pagination
-    }
-  }
+      paging: false,
+    },
+  },
 };
+
 const Register = () => {
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     firstName: "",
     lastName: "",
     dob: "",
     gender: "",
     phone: "",
     location: "",
-    orgUnit: ""
-  });
+    orgUnit: "",
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
   const [orgUnits, setOrgUnits] = useState([]);
   const [loading, setLoading] = useState(false);
   const [enrollmentSuccess, setEnrollmentSuccess] = useState(false);
-  const {
-    loading: orgLoading,
-    error,
-    data
-  } = useDataQuery(orgUnitQuery);
+
+  const { loading: orgLoading, error, data } = useDataQuery(orgUnitQuery);
+
+  // Use useCallback to prevent re-creation of functions
+  const handleChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    },
+    [setFormData]
+  );
+
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setLoading(true);
+
+      try {
+        const response = await registerPatient(formData);
+        if (response.status === "OK") {
+          setEnrollmentSuccess(true);
+          setFormData(initialFormState); // Reset form on success
+        }
+      } catch (error) {
+        console.error("Error registering patient:", error);
+        alert("Error registering patient");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [formData, initialFormState]
+  );
+
   useEffect(() => {
-    if (data && Array.isArray(data.organisationUnits.organisationUnits)) {
-      setOrgUnits(data.organisationUnits.organisationUnits); // Save fetched organization units
+    if (data?.organisationUnits?.organisationUnits) {
+      setOrgUnits(data.organisationUnits.organisationUnits);
     }
   }, [data]);
-  const handleChange = e => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const response = await registerPatient(formData); // API call to register patient
-      if (response.status === "OK") {
-        setEnrollmentSuccess(true);
-      }
-    } catch (error) {
-      console.error("Error registering patient:", error);
-      alert("Error registering patient");
-    } finally {
-      setLoading(false);
-    }
-  };
+
+  // Render Loader
   if (orgLoading) {
-    return /*#__PURE__*/React.createElement("div", {
-      className: "loader"
-    }, /*#__PURE__*/React.createElement(CircularLoader, null), " ", /*#__PURE__*/React.createElement("p", null, "Loading organization units, please wait..."));
+    return (
+      <div className="loader">
+        <CircularLoader />
+        <p>Loading organization units, please wait...</p>
+      </div>
+    );
   }
-  if (error) return /*#__PURE__*/React.createElement("div", null, "Error fetching organization units");
-  return /*#__PURE__*/React.createElement("div", {
-    className: "register-form"
-  }, /*#__PURE__*/React.createElement("h2", null, "Register Patient"), /*#__PURE__*/React.createElement("form", {
-    onSubmit: handleSubmit
-  }, /*#__PURE__*/React.createElement("input", {
-    type: "text",
-    name: "firstName",
-    placeholder: "First Name",
-    onChange: handleChange,
-    required: true
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "text",
-    name: "lastName",
-    placeholder: "Last Name",
-    onChange: handleChange,
-    required: true
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "date",
-    name: "dob",
-    placeholder: "Date of Birth",
-    onChange: handleChange,
-    required: true
-  }), /*#__PURE__*/React.createElement("select", {
-    name: "gender",
-    onChange: handleChange,
-    required: true
-  }, /*#__PURE__*/React.createElement("option", {
-    value: ""
-  }, "Select Gender"), /*#__PURE__*/React.createElement("option", {
-    value: "Male"
-  }, "Male"), /*#__PURE__*/React.createElement("option", {
-    value: "Female"
-  }, "Female"), /*#__PURE__*/React.createElement("option", {
-    value: "Other"
-  }, "Other")), /*#__PURE__*/React.createElement("input", {
-    type: "tel",
-    name: "phone",
-    placeholder: "Phone Number",
-    onChange: handleChange,
-    required: true
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "text",
-    name: "location",
-    placeholder: "Location",
-    onChange: handleChange
-  }), /*#__PURE__*/React.createElement("select", {
-    name: "orgUnit",
-    onChange: handleChange,
-    required: true
-  }, /*#__PURE__*/React.createElement("option", {
-    value: ""
-  }, "Select Organization Unit"), orgUnits.map(unit => /*#__PURE__*/React.createElement("option", {
-    key: unit.id,
-    value: unit.id
-  }, unit.name))), /*#__PURE__*/React.createElement(Button, {
-    type: "submit",
-    disabled: loading,
-    loading: loading
-  }, loading ? "Registering..." : "Register"), /*#__PURE__*/React.createElement(Button, {
-    type: "reset",
-    secondary: true
-  }, "Cancel"), enrollmentSuccess && /*#__PURE__*/React.createElement(NoticeBox, {
-    title: "Success",
-    success: true
-  }, "Patient Registered Successfully!")));
+
+  // Render Error
+  if (error) {
+    return <div>Error fetching organization units</div>;
+  }
+
+  // Render Form
+  return (
+    <div className="register-form">
+      <h2>Register Patient</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="firstName"
+          placeholder="First Name"
+          onChange={handleChange}
+          value={formData.firstName}
+          required
+        />
+        <input
+          type="text"
+          name="lastName"
+          placeholder="Last Name"
+          onChange={handleChange}
+          value={formData.lastName}
+          required
+        />
+        <input
+          type="date"
+          name="dob"
+          onChange={handleChange}
+          value={formData.dob}
+          required
+        />
+        <select
+          name="gender"
+          onChange={handleChange}
+          value={formData.gender}
+          required
+        >
+          <option value="">Select Gender</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+          <option value="Other">Other</option>
+        </select>
+        <input
+          type="tel"
+          name="phone"
+          placeholder="Phone Number"
+          onChange={handleChange}
+          value={formData.phone}
+          required
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          onChange={handleChange}
+          value={formData.location}
+        />
+        <select
+          name="orgUnit"
+          onChange={handleChange}
+          value={formData.orgUnit}
+          required
+        >
+          <option value="">Select Organization Unit</option>
+          {orgUnits.map(({ id, name }) => (
+            <option key={id} value={id}>
+              {name}
+            </option>
+          ))}
+        </select>
+        <Button type="submit" disabled={loading} loading={loading}>
+          {loading ? "Registering..." : "Register"}
+        </Button>
+        <Button type="reset" secondary onClick={() => setFormData(initialFormState)}>
+          Cancel
+        </Button>
+        {enrollmentSuccess && (
+          <NoticeBox title="Success" success>
+            Patient Registered Successfully!
+          </NoticeBox>
+        )}
+      </form>
+    </div>
+  );
 };
+
 export default Register;

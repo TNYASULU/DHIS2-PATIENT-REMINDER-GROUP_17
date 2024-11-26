@@ -4,15 +4,16 @@ import Registration from "./Components/Registration/Register";
 import Sidebar from "./Components/sidebar/sidebar"; 
 import Enrollment from "./Components/Enrollment/enroll";
 import Patients from "./Components/patients/patients";
+import { Welcome } from "./Components/welcome/Welcome";
 
 const MyApp = () => {
   return (
-    <BrowserRouter> {/* Wrap the app with BrowserRouter */}
+    <BrowserRouter className="app">
       <div className="homeContainer">
-        <Sidebar /> {/* Corrected capitalization */}
+        <Sidebar /> 
         <div className="contentWrapper">
           <Routes>
-            <Route path="/" element={<div>Welcome</div>} />
+            <Route index element={<Welcome/> } />
             <Route path="/reminder" element={<div>Reminder</div>} />
             <Route path="/enroll-patients" element={<Enrollment />} />
             <Route path="/patients" element={<Patients />} />
