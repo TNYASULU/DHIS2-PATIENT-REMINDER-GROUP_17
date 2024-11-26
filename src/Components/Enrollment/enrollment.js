@@ -50,7 +50,7 @@ const Enroll = () => {
           },
         });
         const data = await response.json();
-        setPrograms(data.programs); // Assuming data has 'programs' field
+        setPrograms(data.programs); 
       } catch (error) {
         setError('Failed to load programs');
       } finally {
@@ -61,7 +61,7 @@ const Enroll = () => {
     fetchPrograms();
   }, []);
 
-  // Fetch Patients (Tracked Entity Instances)
+  // Fetch Patients 
   useEffect(() => {
     const fetchPatients = async () => {
       setLoading(true);
@@ -73,7 +73,7 @@ const Enroll = () => {
           },
         });
         const data = await response.json();
-        setPatients(data.trackedEntityInstances); // Assuming data has 'trackedEntityInstances' field
+        setPatients(data.trackedEntityInstances); 
       } catch (error) {
         setError('Failed to load patients');
       } finally {
@@ -106,7 +106,7 @@ const Enroll = () => {
         enrollmentDate: formData.enrollmentDate, // Enrollment date
       };
 
-      // API call to enroll the patient (replace with actual DHIS2 endpoint)
+      // API call to enroll the patient 
       await fetch('https://your-dhis2-instance/api/enrollments', {
         method: 'POST',
         headers: {
@@ -116,7 +116,7 @@ const Enroll = () => {
         body: JSON.stringify(enrollmentDetails),
       });
 
-      // Example reminder scheduling (adjust as necessary)
+      // Example reminder scheduling 
       const reminderDetails = {
         message: `Hello ${formData.patientId}, this is your reminder.`,
         date: formData.enrollmentDate, // Example date, can be adjusted
