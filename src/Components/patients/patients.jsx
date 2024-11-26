@@ -2,7 +2,7 @@ import React from "react";
 import "./patients.css";
 import { DataQuery } from "@dhis2/app-runtime";
 
-const trackedEntityTypeId = "rGEGchYDTGG";
+/*const trackedEntityTypeId = "rGEGchYDTGG";
 const orgUnitId = "DiszpKrYNg8";
 
 const query = {
@@ -14,7 +14,7 @@ const query = {
       trackedEntityType: trackedEntityTypeId,
     },
   },
-};
+};*/
 
 const Patients = () => {
   return (
