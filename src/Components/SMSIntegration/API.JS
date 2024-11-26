@@ -1,62 +1,37 @@
 const express = require('express');
-const axios = require('axios');
-const bodyParser = require('body-parser');
-require('dotenv').config();
+const { Vonage } = require('@vonage/server-sdk');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+app.use(express.json());
 
-// Middleware
-app.use(bodyParser.json());
+require('dotenv').config();
 
-// DHIS2 API Configuration (stored in environment variables for security)
-const DHIS2_BASE_URL = process.env.DHIS2_BASE_URL; // e.g., https://<your-dhis2-instance-url>/api
-const DHIS2_USERNAME = process.env.DHIS2_USERNAME;
-const DHIS2_PASSWORD = process.env.DHIS2_PASSWORD;
+const vonage = new Vonage({
+  apiKey: process.env.VONAGE_API_KEY,
+  apiSecret: process.env.VONAGE_API_SECRET,
+});
 
-// Helper function to send SMS via DHIS2
-const sendSmsViaDHIS2 = async (phoneNumber, message) => {
-    try {
-        const response = await axios.post(
-            `${DHIS2_BASE_URL}/sms/outbound`,
-            {
-                message, // Message content
-                recipients: [phoneNumber], // Recipient phone number
-            },
-            {
-                auth: {
-                    username: DHIS2_USERNAME,
-                    password: DHIS2_PASSWORD,
-                },
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            }
-        );
-        return response.data;
-    } catch (error) {
-        console.error('Error sending SMS:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.message || 'Failed to send SMS');
-    }
-};
-
-// API Endpoint to handle SMS requests
+// SMS Sending Endpoint
 app.post('/api/sms/send', async (req, res) => {
-    const { phoneNumber, message } = req.body;
+  const { phoneNumber, message } = req.body;
 
-    if (!phoneNumber || !message) {
-        return res.status(400).json({ error: 'Phone number and message are required' });
-    }
+  try {
+    const from = "VonageAPI"; // This is overridden by Vonage on trial accounts
+    const to = phoneNumber;
+    const text = message;
 
-    try {
-        const result = await sendSmsViaDHIS2(phoneNumber, message);
-        res.status(200).json({ message: 'SMS sent successfully!', result });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+    const response = await vonage.sms.send({ to, from, text });
+
+    if (response.messages[0].status === '0') {
+      res.status(200).json({ success: true, message: 'SMS sent successfully!' });
+    } else {
+      res.status(400).json({ success: false, error: response.messages[0]['error-text'] });
     }
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
+  }
 });
 
 // Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

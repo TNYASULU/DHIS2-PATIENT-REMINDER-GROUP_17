@@ -10,7 +10,7 @@ const SMSComponent = () => {
         e.preventDefault();
     
         try {
-            const response = await fetch('http://localhost:3000/api/sms/send', { // Full backend URL
+            const response = await fetch('http://localhost:3001/api/sms/send', { // Full backend URL
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phoneNumber, message })
