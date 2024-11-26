@@ -5,8 +5,13 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2024-11-13T14:26:03.723Z\n"
 "PO-Revision-Date: 2024-11-13T14:26:03.725Z\n"
+=======
+"POT-Creation-Date: 2024-11-12T20:58:05.091Z\n"
+"PO-Revision-Date: 2024-11-12T20:58:05.094Z\n"
+>>>>>>> f7d4266f7c9350ba954badc4be640758fa61290c
 
 msgid "ERROR"
 msgstr "ERROR"
@@ -14,8 +19,19 @@ msgstr "ERROR"
 msgid "Loading..."
 msgstr "Loading..."
 
+msgid "Welcome to DHIS2!"
+msgstr "Welcome to DHIS2!"
+
 msgid "Hello {{name}}"
 msgstr "Hello {{name}}"
 
+<<<<<<< HEAD
 msgid "Welcome to DHIS2 GROUP 17"
 msgstr "Welcome to DHIS2 GROUP 17"
+=======
+msgctxt "REMINDER BY GROUP"
+msgid "PATIENT"
+msgid_plural "PATIENT"
+msgstr[0] ""
+msgstr[1] "PATIENT_REMINDER BY GROUP_17"
+>>>>>>> f7d4266f7c9350ba954badc4be640758fa61290c
