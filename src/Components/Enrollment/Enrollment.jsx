@@ -1,88 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { authenticateAndGetAccessToken, scheduleReminder } from '../api/Dhis2Api'; // Adjust import paths
+import React, { useState } from "react";
+import { useDataQuery } from "@dhis2/app-runtime"; // Import the DHIS2 app runtime
+import { Button, NoticeBox, CircularLoader } from "@dhis2/ui";
+import "./enrollment.css"; // Import the custom CSS
+
+// Define DHIS2 queries for organization units, programs, and patients
+const orgUnitsQuery = {
+  organisationUnits: {
+    resource: 'organisationUnits',
+    params: {
+      fields: 'id,name', // Fetch id and name of organization units
+    },
+  },
+};
+
+const programsQuery = {
+  programs: {
+    resource: 'programs',
+    params: {
+      fields: 'id,displayName', // Fetch id and displayName of programs
+    },
+  },
+};
+
+const patientsQuery = {
+  trackedEntityInstances: {
+    resource: 'trackedEntityInstances',
+    params: {
+      fields: 'id,displayName', // Fetch id and displayName of patients
+    },
+  },
+};
 
 const Enroll = () => {
-  // State for form data and fetched options
+  // State for form data and selected options
   const [formData, setFormData] = useState({
     orgUnit: '',
     programId: '',
     patientId: '',
-    enrollmentDate: ''
+    enrollmentDate: '',
   });
-  const [orgUnits, setOrgUnits] = useState([]);
-  const [programs, setPrograms] = useState([]);
-  const [patients, setPatients] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Fetch Organization Units from DHIS2
-  useEffect(() => {
-    const fetchOrgUnits = async () => {
-      setLoading(true);
-      try {
-        const accessToken = await authenticateAndGetAccessToken();
-        const response = await fetch('https://data.research.dhis2.org/api/organisationUnits.json', {
-          headers: {
-            Authorization: "Basic " + btoa('admin:district'),
-          },
-        });
-        const data = await response.json();
-        setOrgUnits(data.organisationUnits); 
-      } catch (error) {
-        setError('Failed to load organization units');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrgUnits();
-  }, []);
-
-  // Fetch Programs from DHIS2
-  useEffect(() => {
-    const fetchPrograms = async () => {
-      setLoading(true);
-      try {
-        const accessToken = await authenticateAndGetAccessToken();
-        const response = await fetch('https://data.research.dhis2.org/api/programs.json', {
-          headers: {
-            Authorization: "Basic " + btoa('admin:district'),
-          },
-        });
-        const data = await response.json();
-        setPrograms(data.programs); 
-      } catch (error) {
-        setError('Failed to load programs');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPrograms();
-  }, []);
-
-  // Fetch Patients 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      setLoading(true);
-      try {
-        const accessToken = await authenticateAndGetAccessToken();
-        const response = await fetch('https://data.research.dhis2.org/api/patients.json', {
-          headers: {
-            Authorization: "Basic " + btoa('admin:district'),
-          },
-        });
-        const data = await response.json();
-        setPatients(data.trackedEntityInstances); 
-      } catch (error) {
-        setError('Failed to load patients');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPatients();
-  }, []);
+  // Fetch data using useDataQuery
+  const { data: orgUnitsData, loading: orgUnitsLoading, error: orgUnitsError } = useDataQuery(orgUnitsQuery);
+  const { data: programsData, loading: programsLoading, error: programsError } = useDataQuery(programsQuery);
+  const { data: patientsData, loading: patientsLoading, error: patientsError } = useDataQuery(patientsQuery);
 
   // Handle form data change
   const handleChange = (e) => {
@@ -96,7 +58,6 @@ const Enroll = () => {
   // Handle form submission for enrolling the patient
   const handleEnrollPatient = async (event) => {
     event.preventDefault();
-    const accessToken = await authenticateAndGetAccessToken();
 
     try {
       const enrollmentDetails = {
@@ -106,29 +67,33 @@ const Enroll = () => {
         enrollmentDate: formData.enrollmentDate, // Enrollment date
       };
 
-      // API call to enroll the patient 
-      await fetch('https://data.research.dhis2.org/api/enrollments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization:"Basic " + btoa('admin:district'),
-        },
-        body: JSON.stringify(enrollmentDetails),
-      });
+      // Replace this with your actual API call for enrollment
+      // Example: await registerPatient(enrollmentDetails);
 
-      // Example reminder scheduling 
-      const reminderDetails = {
-        message: `Hello ${formData.patientId}, this is your reminder.`,
-        date: formData.enrollmentDate, // Example date, can be adjusted
-      };
-      await scheduleReminder(formData.programId, reminderDetails, accessToken);
-
-      console.log('Patient enrolled and reminder scheduled.');
+      console.log("Patient enrolled successfully.");
     } catch (error) {
-      setError('Error enrolling patient or scheduling reminder');
+      setError("Error enrolling patient");
       console.error(error);
     }
   };
+
+  // Check for loading states and render UI accordingly
+  if (orgUnitsLoading || programsLoading || patientsLoading) {
+    return (
+      <div className="loader-container">
+        <CircularLoader />
+      </div>
+    );
+  }
+
+  // Error handling
+  if (orgUnitsError || programsError || patientsError) {
+    return (
+      <NoticeBox title="Error" error>
+        Something went wrong while fetching data.
+      </NoticeBox>
+    );
+  }
 
   return (
     <div className="enroll-form">
@@ -145,17 +110,11 @@ const Enroll = () => {
             required
           >
             <option value="" disabled>Select Organization Unit</option>
-            {loading ? (
-              <option>Loading...</option>
-            ) : error ? (
-              <option>{error}</option>
-            ) : (
-              orgUnits.map((unit) => (
-                <option key={unit.id} value={unit.id}>
-                  {unit.name}
-                </option>
-              ))
-            )}
+            {orgUnitsData.organisationUnits.map((unit) => (
+              <option key={unit.id} value={unit.id}>
+                {unit.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -170,17 +129,11 @@ const Enroll = () => {
             required
           >
             <option value="" disabled>Select Program</option>
-            {loading ? (
-              <option>Loading...</option>
-            ) : error ? (
-              <option>{error}</option>
-            ) : (
-              programs.map((program) => (
-                <option key={program.id} value={program.id}>
-                  {program.displayName}
-                </option>
-              ))
-            )}
+            {programsData.programs.map((program) => (
+              <option key={program.id} value={program.id}>
+                {program.displayName}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -195,17 +148,11 @@ const Enroll = () => {
             required
           >
             <option value="" disabled>Select Patient</option>
-            {loading ? (
-              <option>Loading...</option>
-            ) : error ? (
-              <option>{error}</option>
-            ) : (
-              patients.map((patient) => (
-                <option key={patient.id} value={patient.id}>
-                  {patient.name}
-                </option>
-              ))
-            )}
+            {patientsData.trackedEntityInstances.map((patient) => (
+              <option key={patient.id} value={patient.id}>
+                {patient.displayName}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -223,14 +170,14 @@ const Enroll = () => {
         </div>
 
         {/* Submit Button */}
-        <button type="submit" disabled={loading}>Enroll</button>
+        <Button type="submit" primary>
+          Enroll Patient
+        </Button>
       </form>
 
-      {error && <p className="error">{error}</p>}
+      {error && <NoticeBox title="Error" error>{error}</NoticeBox>}
     </div>
   );
 };
 
 export default Enroll;
-
-
