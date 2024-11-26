@@ -34,7 +34,7 @@ const Register = () => {
 
   const { loading: orgLoading, error, data } = useDataQuery(orgUnitQuery);
 
-  // Use useCallback to prevent re-creation of functions
+  // Using useCallback to prevent recreation of functions
   const handleChange = useCallback(
     (e) => {
       const { name, value } = e.target;
@@ -52,7 +52,7 @@ const Register = () => {
         const response = await registerPatient(formData);
         if (response.status === "OK") {
           setEnrollmentSuccess(true);
-          setFormData(initialFormState); // Reset form on success
+          setFormData(initialFormState); // Reseting  form on success!
         }
       } catch (error) {
         console.error("Error registering patient:", error);
@@ -160,7 +160,7 @@ const Register = () => {
         </Button>
         {enrollmentSuccess && (
           <NoticeBox title="Success" success>
-            Patient Registered Successfully!
+            Patient Registered Successfully!!
           </NoticeBox>
         )}
       </form>
