@@ -8,26 +8,27 @@ const SMSComponent = () => {
 
     const handleSendSMS = async (e) => {
         e.preventDefault();
-
-        // Call backend API to send SMS
+    
         try {
-            const response = await fetch('/api/sms/send', {  // Adjust endpoint to match your backend
+            const response = await fetch('http://localhost:3000/api/sms/send', { // Full backend URL
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ phoneNumber, message })
             });
-            const result = await response.json();
-            
-            if (response.ok) {
-                setStatus('SMS sent successfully!');
-            } else {
-                setStatus(`Failed to send SMS: ${result.error}`);
+    
+            if (!response.ok) {
+                const errorText = await response.text();  // Read raw response for debugging
+                throw new Error(`Failed with status ${response.status}: ${errorText}`);
             }
+    
+            const result = await response.json();
+            setStatus('SMS sent successfully!');
         } catch (error) {
+            console.error('Error sending SMS:', error.message);
             setStatus(`Error: ${error.message}`);
         }
     };
-
+    
     return (
         <div className="sms-container">
             <h2>Send SMS</h2>
