@@ -111,7 +111,7 @@ const Enroll = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization:
+          Authorization:"Basic " + btoa('admin:district'),
         },
         body: JSON.stringify(enrollmentDetails),
       });
