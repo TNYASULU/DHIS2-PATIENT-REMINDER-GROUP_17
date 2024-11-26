@@ -27,7 +27,7 @@ const Enroll = () => {
           },
         });
         const data = await response.json();
-        setOrgUnits(data.organisationUnits); // Assuming data has 'organisationUnits' field
+        setOrgUnits(data.organisationUnits); 
       } catch (error) {
         setError('Failed to load organization units');
       } finally {
