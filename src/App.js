@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Registration from "./Components/Registration/Register";
 import Sidebar from "./Components/sidebar/sidebar"; 
-import Enrollment from "./Components/Enrollment/enroll";
+import Enroll from "./Components/Enrollment/Enrollment";
 import Patients from "./Components/patients/patients";
 import { Welcome } from "./Components/welcome/Welcome";
 import SMSIntegration from "./Components/SMSIntegration/SMSComponent"
@@ -16,7 +16,7 @@ const MyApp = () => {
           <Routes>
             <Route index element={<Welcome/> } />
             <Route path="/reminder" element={<div>Reminder</div>} />
-            <Route path="/enroll-patients" element={<Enrollment />} />
+            <Route path="/enroll-patients" element={<Enroll />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/registration" element={<Registration />} />
             <Route path="/SMSIntegration" element={<SMSIntegration />} />
