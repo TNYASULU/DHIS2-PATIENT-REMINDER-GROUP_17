@@ -29,7 +29,7 @@ const programsQuery = (orgUnitId) => ({
     programs: {
         resource: "programs",
         params: {
-            orgUnit: "nEenWmSyUEp",
+            orgUnit: "DFyu9VGpodC",
             fields: ["id", "displayName"],
             paging: false,
         },
@@ -40,7 +40,7 @@ const patientsQuery = (orgUnitId) => ({
     patients: {
         resource: "trackedEntityInstances",
         params: {
-            ou: "nEenWmSyUEp",
+            ou: "DFyu9VGpodC",
             trackedEntityType: "nEenWmSyUEp",
             fields: ["trackedEntityInstance", "attributes"],
             paging: false
@@ -135,7 +135,7 @@ const Enroll = () => {
         try {
             const enrollmentData = {
                 program: "qQIsC9hO2Gj",
-                orgUnit: "rEk35avS8i1",
+                orgUnit: "DFyu9VGpodC",
                 trackedEntityInstance: patientId,
                 enrollmentDate,
             };
