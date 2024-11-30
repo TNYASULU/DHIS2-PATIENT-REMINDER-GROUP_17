@@ -2,8 +2,8 @@ import React from "react";
 import "./patients.css";
 import { DataQuery } from "@dhis2/app-runtime";
 
-const trackedEntityTypeId = "rGEGchYDTGG";
-const orgUnitId = "DiszpKrYNg8";
+const trackedEntityTypeId = "nEenWmSyUEp";
+const orgUnitId = "DFyu9VGpodC";
 
 const query = {
   patientsInProgram: {
