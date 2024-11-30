@@ -1,4 +1,4 @@
-
+/*
 
 
 .missed{
@@ -16,4 +16,88 @@
     background: #0303c7;
     cursor: pointer;
     color: #fff;
-}
+}*/
+
+
+/* Center the content */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    background-color: #f9f9f9; /* Optional: background for better visibility */
+    padding: 20px; /* Ensure some spacing on smaller screens */
+    box-sizing: border-box; /* Include padding in the element's width/height */
+  }
+  
+  /* Styling the container holding the table and title */
+  .patients-cont {
+    text-align: center; /* Center text inside the container */
+    width: 100%; /* Allow content to adapt to the viewport */
+    max-width: 800px; /* Optional: Set max width for readability */
+    background-color: #fff; /* Optional: white background for content */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    border-radius: 8px; /* Rounded corners for a modern look */
+    padding: 20px;
+  }
+  
+  /* Title styling */
+  .title {
+    font-size: 24px;
+    color: #333; /* Neutral text color */
+    margin-bottom: 20px;
+  }
+  
+  /* Table styling */
+  .patients-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto; /* Center table inside the container */
+  }
+  
+  .patients-table th, .patients-table td {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    text-align: right;
+  }
+  
+  .patients-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .patients-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  
+  .patients-table tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  /* Error and loading messages */
+  .missed {
+    color: red;
+    font-weight: bold;
+  }
+  
+  .attended {
+    color: darkblue;
+    font-weight: bold;
+  }
+  
+  /* Hoverable 'viewDetails' class from the original CSS */
+  .viewDetails {
+    background-color: #ddd;
+    border-bottom: 1px solid #fff;
+    transition: all 0.4s ease-in-out;
+    padding: 10px 20px;
+    text-align: center;
+    border-radius: 5px; /* Optional: rounded corners */
+  }
+  
+  .viewDetails:hover {
+    background: #0303c7;
+    cursor: pointer;
+    color: #fff;
+  }
+  
