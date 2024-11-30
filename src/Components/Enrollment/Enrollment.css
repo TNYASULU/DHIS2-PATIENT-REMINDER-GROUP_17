@@ -125,7 +125,7 @@ label {
 
 .submit-button:disabled {
   background-color: #ccc;
-  cursor: not-allowed;
+  cursor: not-allowed; 
 }
 
 /* Notice Box Styling */
