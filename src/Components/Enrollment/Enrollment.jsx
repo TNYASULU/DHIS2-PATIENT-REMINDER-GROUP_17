@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDataQuery } from "@dhis2/app-runtime"; // Import the DHIS2 app runtime
 import { Button, NoticeBox, CircularLoader } from "@dhis2/ui";
-import "./enrollment.css"; // Import the custom CSS
+import "./Enrollment.css"; // Import the custom CSS
 
 // Define DHIS2 queries for organization units, programs, and patients
 const orgUnitsQuery = {
