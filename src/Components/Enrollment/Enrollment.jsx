@@ -1,183 +1,265 @@
-import React, { useState } from "react";
-import { useDataQuery } from "@dhis2/app-runtime"; // Import the DHIS2 app runtime
-import { Button, NoticeBox, CircularLoader } from "@dhis2/ui";
-import "./Enrollment.css"; // Import the custom CSS
 
-// Define DHIS2 queries for organization units, programs, and patients
+import React, { useState, useEffect } from "react";
+import Select from "react-select";
+import { Input, NoticeBox, Button } from "@dhis2/ui";
+import { enrollPatient } from "./Api";
+import "./Enrollment.css";
+import { useDataQuery } from "@dhis2/app-runtime";
+
+// Error messages centralized for reusability
+const ERROR_MESSAGES = {
+    MISSING_FIELDS: "Please fill all fields before enrolling.",
+    UNEXPECTED_RESPONSE: "Enrollment failed: Unexpected response.",
+    PATIENT_ALREADY_ENROLLED: "Enrollment failed: Please ensure the patient isn't already enrolled.",
+};
+
+// Queries for fetching data
 const orgUnitsQuery = {
-  organisationUnits: {
-    resource: 'organisationUnits',
-    params: {
-      fields: 'id,name', // Fetch id and name of organization units
+    orgUnits: {
+        resource: "organisationUnits",
+        params: {
+            fields: ["id", "displayName"],
+            paging: false,
+            level: 2,
+        },
     },
-  },
 };
 
-const programsQuery = {
-  programs: {
-    resource: 'programs',
-    params: {
-      fields: 'id,displayName', // Fetch id and displayName of programs
+const programsQuery = (orgUnitId) => ({
+    programs: {
+        resource: "programs",
+        params: {
+            orgUnit: "PMa2VCrupOd",
+            fields: ["id", "displayName"],
+            paging: false,
+        },
     },
-  },
-};
+});
 
-const patientsQuery = {
-  trackedEntityInstances: {
-    resource: 'trackedEntityInstances',
-    params: {
-      fields: 'id,displayName', // Fetch id and displayName of patients
+const patientsQuery = (orgUnitId) => ({
+    patients: {
+        resource: "trackedEntityInstances",
+        params: {
+            ou: "PMa2VCrupOd",
+            trackedEntityType: "nEenWmSyUEp",
+            fields: ["trackedEntityInstance", "attributes"],
+            paging: false
+        },
     },
-  },
-};
+});
+
+const mapToOptions = (items, labelKey = "displayName", valueKey = "id") =>
+    items?.map((item) => ({
+        value: item[valueKey],
+        label: item[labelKey],
+    })) || [];
 
 const Enroll = () => {
-  // State for form data and selected options
-  const [formData, setFormData] = useState({
-    orgUnit: '',
-    programId: '',
-    patientId: '',
-    enrollmentDate: '',
-  });
-  const [error, setError] = useState('');
+    const [formData, setFormData] = useState({
+        orgUnit: "",
+        programEnrolled: "",
+        patientId: "",
+        enrollmentDate: new Date().toISOString().split("T")[0],
+    });
 
-  // Fetch data using useDataQuery
-  const { data: orgUnitsData, loading: orgUnitsLoading, error: orgUnitsError } = useDataQuery(orgUnitsQuery);
-  const { data: programsData, loading: programsLoading, error: programsError } = useDataQuery(programsQuery);
-  const { data: patientsData, loading: patientsLoading, error: patientsError } = useDataQuery(patientsQuery);
+    const [status, setStatus] = useState({
+        success: false,
+        error: "",
+        loading: false,
+    });
 
-  // Handle form data change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
+    const { loading: loadingOrgUnits, data: orgUnitsData } = useDataQuery(orgUnitsQuery);
+    const { loading: loadingPrograms, data: programsData, refetch: refetchPrograms } =
+        useDataQuery(programsQuery(formData.orgUnit), { lazy: true });
+    const { loading: loadingPatients, data: patientsData, refetch: refetchPatients } =
+        useDataQuery(patientsQuery(formData.orgUnit), { lazy: true });
 
-  // Handle form submission for enrolling the patient
-  const handleEnrollPatient = async (event) => {
-    event.preventDefault();
+    console.log(patientsData);
 
-    try {
-      const enrollmentDetails = {
-        program: formData.programId,
-        trackedEntityInstance: formData.patientId, // Unique patient ID
-        orgUnit: formData.orgUnit, // Selected organization unit
-        enrollmentDate: formData.enrollmentDate, // Enrollment date
-      };
 
-      // Replace this with your actual API call for enrollment
-      // Example: await registerPatient(enrollmentDetails);
+    const orgUnitsList = mapToOptions(orgUnitsData?.orgUnits?.organisationUnits);
+    const programsList = mapToOptions(programsData?.programs?.programs);
+    const patientsList =
+        patientsData?.patients?.trackedEntityInstances?.map((patient) => {
+            const firstName = patient.attributes.find((attr) => attr.attribute === "w75KJ2mc4zz")?.value;
+            const lastName = patient.attributes.find((attr) => attr.attribute === "zDhUuAYrxNC")?.value;
+            return {
+                value: patient.trackedEntityInstance,
+                label: `${firstName || ""} ${lastName || ""}`.trim(),
+            };
+        }) || [];
 
-      console.log("Patient enrolled successfully.");
-    } catch (error) {
-      setError("Error enrolling patient");
-      console.error(error);
-    }
-  };
+    const [selectedPatientDetails, setSelectedPatientDetails] = useState(null);
 
-  // Check for loading states and render UI accordingly
-  if (orgUnitsLoading || programsLoading || patientsLoading) {
+
+    useEffect(() => {
+        if (formData.orgUnit) {
+            refetchPrograms();
+            refetchPatients();
+        }
+    }, [formData.orgUnit]);
+
+    const handleSelectChange = (selectedOption, fieldName) => {
+        setFormData((prev) => ({
+            ...prev,
+            [fieldName]: selectedOption?.value || "",
+        }));
+
+        if (fieldName === "patientId" && selectedOption) {
+            const patientDetails = patientsData?.patients?.trackedEntityInstances?.find(
+                (patient) => patient.trackedEntityInstance === selectedOption.value
+            );
+
+            if (patientDetails) {
+                const details = {
+                    id: patientDetails.trackedEntityInstance,
+                    firstName: patientDetails.attributes.find((attr) => attr.attribute === "w75KJ2mc4zz").value,
+                    lastName: patientDetails.attributes.find((attr) => attr.attribute === "zDhUuAYrxNC").value,
+                    phone: patientDetails.attributes.find((attr) => attr.attribute === "P2cwLGskgxn").value, // Example attribute for phone
+                };
+                setSelectedPatientDetails(details);
+            }
+        }
+    };
+
+    const handleEnroll = async () => {
+        const { orgUnit, programEnrolled, patientId, enrollmentDate } = formData;
+
+        if (!orgUnit || !programEnrolled || !patientId) {
+            setStatus({ success: false, error: ERROR_MESSAGES.MISSING_FIELDS, loading: false });
+            return;
+        }
+
+        setStatus({ success: false, error: "", loading: true });
+
+        try {
+            const enrollmentData = {
+                program: "qQIsC9hO2Gj",
+                orgUnit: "PMa2VCrupOd",
+                trackedEntityInstance: patientId,
+                enrollmentDate,
+            };
+
+            const response = await enrollPatient(enrollmentData);
+            console.log(response)
+
+            if (response) {
+                setStatus({ success: true, error: "", loading: false });
+                var formdata = new FormData();
+                formdata.append("api_key", "Ph4i9BVUxXknLl6hjUf2");
+                formdata.append("password", "Zione@062000");
+                formdata.append("text", `Hello ${selectedPatientDetails.firstName} ${selectedPatientDetails.lastName}, you have been enrolled to group8 health program`);
+                formdata.append("numbers", selectedPatientDetails.phone);
+                formdata.append("from", "WGIT");
+
+                var requestOptions = {
+                    method: 'POST',
+                    body: formdata,
+                    redirect: 'follow'
+                };
+
+                fetch("https://corsproxy.io/?https://telcomw.com/api-v2/send", requestOptions)
+                    .then(response => response.text())
+                    .then(result => console.log(result))
+                    .catch(error => console.log('error', error));
+            } else {
+                setStatus({ success: false, error: ERROR_MESSAGES.UNEXPECTED_RESPONSE, loading: false });
+            }
+        } catch (error) {
+            const errorMessage =
+                error.response?.status === 409
+                    ? ERROR_MESSAGES.PATIENT_ALREADY_ENROLLED
+                    : "Enrollment failed: Please try again.";
+            setStatus({
+                success: false,
+                error: errorMessage,
+                loading: false,
+            });
+        }
+    };
+
     return (
-      <div className="loader-container">
-        <CircularLoader />
-      </div>
+      <div className="main-content">
+        <form onSubmit={(e) => e.preventDefault()} className="form-container">
+            <h2 className="form-header">Patient Enrollment</h2>
+            
+    
+            <div className="form-group">
+                <label>Organization Unit:</label>
+                <Select
+                    options={orgUnitsList}
+                    value={orgUnitsList.find((option) => option.value === formData.orgUnit)}
+                    onChange={(option) => handleSelectChange(option, "orgUnit")}
+                    className="select-field"
+                    placeholder="Select organization unit"
+                    isLoading={loadingOrgUnits}
+                />
+            </div>
+
+            <div className="form-group">
+                <label>Program:</label>
+                <Select
+                    options={programsList}
+                    value={programsList.find((option) => option.value === formData.programEnrolled)}
+                    onChange={(option) => handleSelectChange(option, "programEnrolled")}
+                    className="select-field"
+                    placeholder="Select program"
+                    isLoading={loadingPrograms}
+                />
+            </div>
+
+            <div className="form-group">
+                <label>Patient:</label>
+                <Select
+                    options={patientsList}
+                    value={patientsList.find((option) => option.value === formData.patientId)}
+                    onChange={(option) => handleSelectChange(option, "patientId")}
+                    className="select-field"
+                    placeholder="Select patient"
+                    isLoading={loadingPatients}
+
+                />
+            </div>
+
+            <div className="form-group">
+                <Input
+                    label="Enrollment Date"
+                    type="date"
+                    value={formData.enrollmentDate}
+                    onChange={({ value }) =>
+                        setFormData((prev) => ({ ...prev, enrollmentDate: value }))
+                    }
+                    className="input-field"
+                />
+            </div>
+
+            <button
+                onClick={handleEnroll}
+                type="button"
+                className="submit-button"
+                disabled={status.loading}
+            >
+                {status.loading ? "Enrolling..." : "Enroll Patient"}
+            </button>
+
+            {status.error && (
+                <NoticeBox title="Error" error>
+                    {status.error}
+                </NoticeBox>
+            )}
+
+            {status.success && (
+                <NoticeBox title="Success" success>
+                    Patient enrolled successfully!
+                </NoticeBox>
+            )}
+          
+    </form>
+</div>
+
     );
-  }
-
-  // Error handling
-  if (orgUnitsError || programsError || patientsError) {
-    return (
-      <NoticeBox title="Error" error>
-        Something went wrong while fetching data.
-      </NoticeBox>
-    );
-  }
-
-  return (
-    <div className="enroll-form">
-      <h1>Enroll Patient</h1>
-      <form onSubmit={handleEnrollPatient}>
-        {/* Select Organization Unit */}
-        <div className="form-group">
-          <label htmlFor="orgUnit">Select Organization Unit</label>
-          <select
-            id="orgUnit"
-            name="orgUnit"
-            value={formData.orgUnit}
-            onChange={handleChange}
-            required
-          >
-            <option value="" disabled>Select Organization Unit</option>
-            {orgUnitsData.organisationUnits.map((unit) => (
-              <option key={unit.id} value={unit.id}>
-                {unit.name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Select Program */}
-        <div className="form-group">
-          <label htmlFor="programId">Select Program</label>
-          <select
-            id="programId"
-            name="programId"
-            value={formData.programId}
-            onChange={handleChange}
-            required
-          >
-            <option value="" disabled>Select Program</option>
-            {programsData.programs.map((program) => (
-              <option key={program.id} value={program.id}>
-                {program.displayName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Select Patient */}
-        <div className="form-group">
-          <label htmlFor="patientId">Select Patient</label>
-          <select
-            id="patientId"
-            name="patientId"
-            value={formData.patientId}
-            onChange={handleChange}
-            required
-          >
-            <option value="" disabled>Select Patient</option>
-            {patientsData.trackedEntityInstances.map((patient) => (
-              <option key={patient.id} value={patient.id}>
-                {patient.displayName}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Select Enrollment Date */}
-        <div className="form-group">
-          <label htmlFor="enrollmentDate">Select Enrollment Date</label>
-          <input
-            type="date"
-            id="enrollmentDate"
-            name="enrollmentDate"
-            value={formData.enrollmentDate}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        {/* Submit Button */}
-        <Button type="submit" primary>
-          Enroll Patient
-        </Button>
-      </form>
-
-      {error && <NoticeBox title="Error" error>{error}</NoticeBox>}
-    </div>
-  );
 };
 
 export default Enroll;
+
+

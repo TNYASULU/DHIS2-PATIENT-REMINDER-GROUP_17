@@ -12,8 +12,8 @@ const api = axios.create({
 // Function to register a patient in DHIS2
 export const registerPatient = async (patientData) => {
     const data = {
-      trackedEntityType: "nEenWmSyUEp", // ID for Person or Patient entity type
-      orgUnit: "DFyu9VGpodC", // Organization unit ID
+      trackedEntityType: "nEenWmSyUEp", // ID for "Person" or "Patient" entity type
+      orgUnit: "PMa2VCrupOd", // Organization unit ID
       attributes: [
         { attribute: "w75KJ2mc4zz", value: patientData.firstName }, // Replace with actual attribute ID
         { attribute: "zDhUuAYrxNC", value: patientData.lastName },
