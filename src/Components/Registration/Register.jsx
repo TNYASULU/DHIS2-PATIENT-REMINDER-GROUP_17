@@ -4,7 +4,7 @@ import { registerPatient } from "./api";
 import "./Register.css";
 import { Button, NoticeBox, CircularLoader } from "@dhis2/ui";
 
-// DHIS2 query to fetch organization units
+
 const orgUnitQuery = {
   organisationUnits: {
     resource: "organisationUnits.json",
