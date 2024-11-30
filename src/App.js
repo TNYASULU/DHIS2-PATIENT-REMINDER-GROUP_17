@@ -16,7 +16,7 @@ const MyApp = () => {
           <Routes>
             <Route index element={<Welcome/> } />
             <Route path="/reminder" element={<div>Reminder</div>} />
-            <Route path="/enroll-patients" element={<Enroll />} />
+            <Route path="/Enrollment" element={<Enroll  />} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/registration" element={<Registration />} />
             <Route path="/SMSIntegration" element={<SMSIntegration />} />

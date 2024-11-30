@@ -1,8 +1,8 @@
 
 import React, { useState, useEffect } from "react";
-//import Select from "react-select";
+import Select from "react-select";
 import { Input, NoticeBox, Button } from "@dhis2/ui";
-import { enrollPatient } from "./api";
+import { enrollPatient } from "./Api";
 import "./Enrollment.css";
 import { useDataQuery } from "@dhis2/app-runtime";
 
@@ -29,7 +29,7 @@ const programsQuery = (orgUnitId) => ({
     programs: {
         resource: "programs",
         params: {
-            orgUnit: "DFyu9VGpodC",
+            orgUnit: "PMa2VCrupOd",
             fields: ["id", "displayName"],
             paging: false,
         },
@@ -40,7 +40,7 @@ const patientsQuery = (orgUnitId) => ({
     patients: {
         resource: "trackedEntityInstances",
         params: {
-            ou: "DFyu9VGpodC",
+            ou: "PMa2VCrupOd",
             trackedEntityType: "nEenWmSyUEp",
             fields: ["trackedEntityInstance", "attributes"],
             paging: false
@@ -135,7 +135,7 @@ const Enroll = () => {
         try {
             const enrollmentData = {
                 program: "qQIsC9hO2Gj",
-                orgUnit: "DFyu9VGpodC",
+                orgUnit: "PMa2VCrupOd",
                 trackedEntityInstance: patientId,
                 enrollmentDate,
             };
@@ -179,9 +179,11 @@ const Enroll = () => {
     };
 
     return (
+      <div className="main-content">
         <form onSubmit={(e) => e.preventDefault()} className="form-container">
             <h2 className="form-header">Patient Enrollment</h2>
-
+            
+    
             <div className="form-group">
                 <label>Organization Unit:</label>
                 <Select
@@ -251,7 +253,10 @@ const Enroll = () => {
                     Patient enrolled successfully!
                 </NoticeBox>
             )}
-        </form>
+          
+    </form>
+</div>
+
     );
 };
 
