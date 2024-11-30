@@ -14,7 +14,7 @@ const query = {
       trackedEntityType: trackedEntityTypeId,
     },
   },
-};
+};*/
 
 const Patients = () => {
   return (
