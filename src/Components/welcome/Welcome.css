@@ -1,0 +1,28 @@
+.desktop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+}
+
+/*.welcomeContent {
+  text-align: center;
+  backgroun
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+} */
+
+.welcomeContent h1 {
+  font-size: 5rem;
+  color: #333333;
+  margin-bottom: 10px;
+}
+
+.welcomeContent p {
+  font-size: 2rem;
+  color:  #2980B9;
+  text-align: center;
+}
